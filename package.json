@@ -1,0 +1,29 @@
+{
+  "name": "pchan",
+  "version": "0.1.0",
+  "description": "JS channels implementation... for async fun",
+  "main": "./src/index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "npm run test:lint && npm run test:node",
+    "test:lint": "xo",
+    "test:node": "ava"
+  },
+  "author": "axdg <axdg@dfant.asia>",
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^0.18.2",
+    "xo": "^0.18.0"
+  },
+  "xo": {
+    "space": true,
+    "semicolon": false,
+    "prefer-arrow-callback": false,
+    "envs": [
+      "node",
+      "browser"
+    ]
+  }
+}
