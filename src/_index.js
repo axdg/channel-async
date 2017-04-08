@@ -117,3 +117,42 @@ function Channel(capacity = 1) {
     set() { return !closed; }
   });
 }
+
+/**
+ * Static send method.
+ *
+ * @param {Object}
+ * @param {Mixed}
+ *
+ * @returns {Promise}
+ */
+Channel.send = function () {}
+
+/**
+ * Static send method.
+ *
+ * @param {Object}
+ *
+ * @returns {Promise}
+ */
+Channel.close = function () {}
+
+/**
+ * Static send method.
+ *
+ * @param {Object}
+ *
+ * @returns {Promise}
+ */
+Channel.receive = function () {}
+
+/**
+ * Static send method.
+ *
+ * @param {Object}
+ * @param {Function}
+ *
+ * @returns {Promise}
+ */
+Channel.range = function () {}
+

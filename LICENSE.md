@@ -1,4 +1,4 @@
-**The MIT License (MIT)**
+**The MIT License**
 
 &copy; axdg ([axdg@dfant.asia](mailto:axdg@dfant.asia)), 2017
 
