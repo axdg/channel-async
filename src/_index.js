@@ -18,7 +18,16 @@ function Channel(capacity = 1) {
     throw new Error('capacity must be a non-zero positive integer');
   }
 
+  /**
+   * The queue method of a Channel object, used for send
+   * and recieving values from a channel.
+   *
+   * @param {Mixed}
+   *
+   * @returns {Promise}
+   */
   this.queue = function (value) {
+    // Called with a value - so a send action.
     if (value !== undefined) {
       return new Promise(function (resolve, reject) {
         // The channel is closed... sending is not possible.
@@ -44,6 +53,7 @@ function Channel(capacity = 1) {
           });
         }
 
+        // Ready to go straight onto the queue.
         return queued.push(function () {
           if (outbound.length > 0) {
             outbound.shift()();
@@ -54,6 +64,56 @@ function Channel(capacity = 1) {
       });
     }
 
-    return
+    // Called with no value, so a recieve action.
+    return new Promise(function (resolve) {
+      // There are no items in the queue.
+      if (!queued.length) {
+        // The channel was closed, so resolve null.
+        if (closed) return resolve(null);
+
+        // The channel is open, wait for a value.
+        return outbound.push(() => {
+          if (inbound.length > 0) {
+            inbound.shift()();
+          }
+
+          return resolve(queued.shift());
+        });
+      }
+
+      if (inbound.length > 0) {
+        inbound.shift()();
+      }
+
+      return resolve(queued.shift());
+    });
   };
+
+  /**
+   * A proxy to `this.queue(null)`, for convinience.
+   *
+   * @returns {Promise}
+   */
+  this.close = function () {
+    return this.queue(null);
+  }
+
+  // Accessor for the Channel's `capacity`.
+  Object.defineProperty(this, 'capacity', {
+    get() { return capacity; }
+    set() { return capacity; }
+  });
+
+  // Accessor for the Channel's `size`.
+  Object.defineProperty(this, 'size', {
+    get() { return queue.length + inbound.length; }
+    set() { return queue.length + inbound.length; }
+  });
+
+  // Accesor indicating if the Channel has been closed.
+
+  Object.defineProperty(this, 'open', {
+    get() { return !closed; }
+    set() { return !closed; }
+  });
 }
