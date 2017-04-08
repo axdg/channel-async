@@ -7,9 +7,10 @@
     "src"
   ],
   "scripts": {
-    "test": "npm run test:lint && npm run test:node",
-    "test:lint": "xo",
-    "test:node": "ava"
+    "test": "npm run test:lint && npm run test:node && npm run test:renderer",
+    "test:lint": "",
+    "test:node": "mocha test/index.js",
+    "test:electron": "electron-mocha test:index.js ::register"
   },
   "author": "axdg <axdg@dfant.asia>",
   "license": "MIT",
