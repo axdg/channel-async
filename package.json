@@ -8,15 +8,22 @@
   ],
   "scripts": {
     "test": "npm run test:lint && npm run test:node && npm run test:renderer",
-    "test:lint": "",
+    "test:lint": "eslint .",
     "test:node": "mocha test/index.js",
-    "test:electron": "electron-mocha test:index.js ::register"
+    "test:electron": "electron-mocha test:index.js"
   },
   "author": "axdg <axdg@dfant.asia>",
   "license": "MIT",
   "devDependencies": {
+    "babel-eslint": "^6.1.2",
+    "electron": "^1.4.15",
+    "electron-mocha": "^3.3.0",
+    "electron-prebuilt": "^1.4.13",
+    "eslint": "^3.4.0",
+    "eslint-config-airbnb-base": "^5.0.3",
+    "eslint-plugin-import": "^1.14.0",
     "electron-mocha": "^3.4.0",
     "expect": "^1.20.2",
-    "mocha": "^3.2.0",
-  },
+    "mocha": "^3.2.0"
+  }
 }

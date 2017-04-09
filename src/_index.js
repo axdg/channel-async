@@ -126,7 +126,9 @@ function Channel(capacity = 1) {
  *
  * @returns {Promise}
  */
-Channel.send = function () {}
+Channel.send = function (channel, value) {
+  return channel.queue(value);
+}
 
 /**
  * Static send method.
@@ -135,7 +137,9 @@ Channel.send = function () {}
  *
  * @returns {Promise}
  */
-Channel.close = function () {}
+Channel.close = function (channel) {
+  return channel.queue(null);
+}
 
 /**
  * Static send method.
@@ -144,7 +148,9 @@ Channel.close = function () {}
  *
  * @returns {Promise}
  */
-Channel.receive = function () {}
+Channel.receive = function (channel) {
+  return channel.queue();
+};
 
 /**
  * Static send method.
@@ -154,5 +160,17 @@ Channel.receive = function () {}
  *
  * @returns {Promise}
  */
-Channel.range = function () {}
+Channel.range = async function (channel, fn) {
+  let value =  await channel.queue()
+  while (value !== null) {
+    try {
+      await fn(value);
+      value = await channel.queue();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  return Promise.resolve();
+};
 
