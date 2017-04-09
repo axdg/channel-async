@@ -6,7 +6,7 @@
  *
  * @returns {Object}
  */
-function Channel(capacity = 1) {
+module.exports = function Channel(capacity = 1) {
   const queued = [];
   const inbound = [];
   const outbound = [];
