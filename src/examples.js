@@ -1,34 +1,27 @@
-/**
- * TODO: Update this `README.md` example to make use
- * of the updated API and code style.
- */
+/* eslint-disable import/no-unresolved, no-cond-assign, no-shadow, no-console */
+const Channel = require('promise-channel'); // eslint-disable-line import/no-unresolved
 
-// const make = require('pchan')
+function sender(channel, data) {
+  const values = [...data];
 
-// const {range, close} = make
+  let value;
+  while (value = values.shift()) {
+    Channel.send(channel, value);
+  }
 
-// function sender(channel, data) {
-//   const values = [...data]
+  Channel.close(channel);
+}
 
-//   let value
-//   while (value = values.shift()) {
-//     channel(value)
-//   }
+async function receiver(channel) {
+  const values = [];
+  Channel.range(channel, values.push);
+  return values;
+}
 
-//   close(channel)
-// }
+const channel = new Channel(1);
+const data = [1, 2, 3, 4, 5];
 
-// async function receiver(channel) {
-//   const values = []
-//   range(channel, value => values.push(value))
+sender(channel, data);
+receiver(channel).then(data => console.log(data));
 
-//   return values
-// }
-
-// const chan = make(1)
-// const data = [1, 2, 3, 4, 5]
-
-// sender(chan, data)
-// receiver(chan).then(data => console.log(data))
-
-// // => '[1, 2, 3, 4, 5]'
+// => '[1, 2, 3, 4, 5]'
