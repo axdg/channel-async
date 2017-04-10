@@ -1,4 +1,7 @@
-/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved, no-cond-assign */
+/**
+ * TODO: Update this `README.md` example to make use
+ * of the updated API and code style.
+ */
 const make = require('pchan')
 
 const {range, close} = make
