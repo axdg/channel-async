@@ -37,11 +37,21 @@ Returns a `boolean` indicating whether or not the channel is open - ie. has not 
 
 ### Channel.send(*channel*, *value*)
 
+ - **channel** (`object`) - a `Channel` instance.
+ - **value** (`mixed`) - the value to pass into the channel (or `null` to close it).
+
 ### Channel.close(*channel*)
+
+ - **channel** (`object`) - a `Channel` instance.
 
 ### Channel.receive(*channel*)
 
+ - **channel** (`object`) - a `Channel` instance.
+
 ### Channel.range(*channel*, *fn*)
+
+ - **channel** (`object`) - a `Channel` instance.
+ - **fn** - (`function`) - a callback function that is passed each value as is received from the channel. `Channel.range` will resolve when the `channel` is closed, or reject with an error is caught.
 
 ## License
 
