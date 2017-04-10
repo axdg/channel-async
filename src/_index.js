@@ -6,7 +6,7 @@
  *
  * @returns {Object}
  */
-module.exports = function Channel(capacity = 1) {
+const Channel = function Channel(capacity = 1) {
   const queued = [];
   const inbound = [];
   const outbound = [];
@@ -96,27 +96,27 @@ module.exports = function Channel(capacity = 1) {
    */
   this.close = function () {
     return this.queue(null);
-  }
+  };
 
   // Accessor for the Channel's `capacity`.
   Object.defineProperty(this, 'capacity', {
-    get() { return capacity; }
-    set() { return capacity; }
+    get() { return capacity; },
+    set() { return capacity; },
   });
 
   // Accessor for the Channel's `size`.
   Object.defineProperty(this, 'size', {
-    get() { return queue.length + inbound.length; }
-    set() { return queue.length + inbound.length; }
+    get() { return queued.length + inbound.length; },
+    set() { return queued.length + inbound.length; },
   });
 
   // Accesor indicating if the Channel has been closed.
 
   Object.defineProperty(this, 'open', {
-    get() { return !closed; }
-    set() { return !closed; }
+    get() { return !closed; },
+    set() { return !closed; },
   });
-}
+};
 
 /**
  * Static send method.
@@ -128,7 +128,7 @@ module.exports = function Channel(capacity = 1) {
  */
 Channel.send = function (channel, value) {
   return channel.queue(value);
-}
+};
 
 /**
  * Static send method.
@@ -139,7 +139,7 @@ Channel.send = function (channel, value) {
  */
 Channel.close = function (channel) {
   return channel.queue(null);
-}
+};
 
 /**
  * Static send method.
@@ -161,11 +161,11 @@ Channel.receive = function (channel) {
  * @returns {Promise}
  */
 Channel.range = async function (channel, fn) {
-  let value =  await channel.queue()
+  let value = await channel.queue();
   while (value !== null) {
     try {
-      await fn(value);
-      value = await channel.queue();
+      await fn(value); // eslint-disable-line no-await-in-loop
+      value = await channel.queue(); // eslint-disable-line no-await-in-loop
     } catch (err) {
       return Promise.reject(err);
     }
@@ -174,3 +174,4 @@ Channel.range = async function (channel, fn) {
   return Promise.resolve();
 };
 
+module.exports = Channel;

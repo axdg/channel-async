@@ -2,32 +2,33 @@
  * TODO: Update this `README.md` example to make use
  * of the updated API and code style.
  */
-const make = require('pchan')
 
-const {range, close} = make
+// const make = require('pchan')
 
-function sender(channel, data) {
-  const values = [...data]
+// const {range, close} = make
 
-  let value
-  while (value = values.shift()) {
-    channel(value)
-  }
+// function sender(channel, data) {
+//   const values = [...data]
 
-  close(channel)
-}
+//   let value
+//   while (value = values.shift()) {
+//     channel(value)
+//   }
 
-async function receiver(channel) {
-  const values = []
-  range(channel, value => values.push(value))
+//   close(channel)
+// }
 
-  return values
-}
+// async function receiver(channel) {
+//   const values = []
+//   range(channel, value => values.push(value))
 
-const chan = make(1)
-const data = [1, 2, 3, 4, 5]
+//   return values
+// }
 
-sender(chan, data)
-receiver(chan).then(data => console.log(data))
+// const chan = make(1)
+// const data = [1, 2, 3, 4, 5]
 
-// => '[1, 2, 3, 4, 5]'
+// sender(chan, data)
+// receiver(chan).then(data => console.log(data))
+
+// // => '[1, 2, 3, 4, 5]'
