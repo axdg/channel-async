@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "test": "npm run test:lint && npm run test:node && npm run test:renderer",
-    "test:lint": "eslint . --debug",
+    "test:lint": "eslint .",
     "test:node": "mocha test/index.js",
     "test:electron": "electron-mocha test:index.js"
   },

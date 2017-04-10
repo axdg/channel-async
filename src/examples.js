@@ -14,7 +14,7 @@ function sender(channel, data) {
 
 async function receiver(channel) {
   const values = [];
-  Channel.range(channel, values.push);
+  await Channel.range(channel, values.push);
   return values;
 }
 
