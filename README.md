@@ -6,6 +6,10 @@
 
 **WIP**
 
+## Installation
+
+`npm install --save <no npm package yet>`
+
 ## Usage
 
 ```js
