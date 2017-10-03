@@ -6,6 +6,13 @@
 
 **WIP**
 
+**TODO:**
+
+ - Publish to NPM
+ - Complete test suite
+ - Create a `promise-channel-fs` module... for reading and writing buffers in a folder.
+ - Set up CI on CircleCI and Semaphore.
+
 ## Installation
 
 `npm install --save <no npm package yet>`

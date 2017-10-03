@@ -1,5 +1,5 @@
-/* eslint-disable import/no-unresolved, no-cond-assign, no-shadow, no-console */
-const Channel = require('promise-channel'); // eslint-disable-line import/no-unresolved
+/* eslint-disable import/no-unresolved, no-cond-assign, no-shadow, no-console, import/no-unresolved, max-len */
+const Channel = require('promise-channel');
 
 function sender(channel, data) {
   const values = [...data];

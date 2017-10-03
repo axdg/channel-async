@@ -1,6 +1,7 @@
 /**
- * The channel constructor function, takes a
- * single argument - the capacity.
+ * The channel constructor function, takes a single argument - the `capacity`,
+ * which one could think of as equivalent to the `highWaterMark` property
+ * of an object mode `Readable` or `Writable` stream.
  *
  * @param {Number}
  *
@@ -32,7 +33,7 @@ const Channel = function Channel(capacity = 1) {
       return new Promise(function (resolve, reject) {
         // The channel is closed... sending is not possible.
         if (closed === true) {
-          return reject(new Error('attempt to send to a closed channel'));
+          return reject(new Error('attempt to send into a closed channel'));
         }
 
         // The channel should be closed.
@@ -53,18 +54,17 @@ const Channel = function Channel(capacity = 1) {
           });
         }
 
-        // Ready to go straight onto the queue.
-        return queued.push(function () {
-          if (outbound.length > 0) {
-            outbound.shift()();
-          }
+        // The internal buffer is not at capacity - ready to go straight onto the queue.
+        queued.push(value);
+        if (outbound.length > 0) {
+          outbound.shift()();
+        }
 
-          return resolve(value);
-        });
+        return resolve();
       });
     }
 
-    // Called with no value, so a recieve action.
+    // Called with no value, so this is a receive action.
     return new Promise(function (resolve) {
       // There are no items in the queue.
       if (!queued.length) {
@@ -111,7 +111,6 @@ const Channel = function Channel(capacity = 1) {
   });
 
   // Accesor indicating if the Channel has been closed.
-
   Object.defineProperty(this, 'open', {
     get() { return !closed; },
     set() { return !closed; },
@@ -119,7 +118,7 @@ const Channel = function Channel(capacity = 1) {
 };
 
 /**
- * Static send method.
+ * Static send method - a property of the Channel constructor.
  *
  * @param {Object}
  * @param {Mixed}
@@ -131,7 +130,9 @@ Channel.send = function (channel, value) {
 };
 
 /**
- * Static send method.
+ * Static close method - a property of the Channel constructor.
+ *
+ * NOTE: This is just sugar over `Channel.send(null)`
  *
  * @param {Object}
  *
@@ -142,7 +143,7 @@ Channel.close = function (channel) {
 };
 
 /**
- * Static send method.
+ * Static recieve method.
  *
  * @param {Object}
  *
@@ -153,7 +154,7 @@ Channel.receive = function (channel) {
 };
 
 /**
- * Static send method.
+ * Static range method - a property of the Channel constructor.
  *
  * @param {Object}
  * @param {Function}
