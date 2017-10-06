@@ -162,17 +162,25 @@ Channel.receive = function (channel) {
  * @returns {Promise}
  */
 Channel.range = async function (channel, fn) {
+  const d = []
   let value = await channel.queue();
   while (value !== null) {
     try {
-      await fn(value); // eslint-disable-line no-await-in-loop
+      const i = await fn(value); // eslint-disable-line no-await-in-loop
+      if (i !== undefined) d.push(i)
       value = await channel.queue(); // eslint-disable-line no-await-in-loop
     } catch (err) {
       return Promise.reject(err);
     }
   }
 
-  return Promise.resolve();
+  return Promise.resolve(d);
 };
 
+  /**
+   * "If you were to take the entire universe and put it in
+   * a tube... then you'd have a really, really big tube."
+   *
+   * - Tim (paraphrase)
+   */
 module.exports = Channel;

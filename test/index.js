@@ -82,11 +82,38 @@ describe('Channel', function () {
       });
 
       // TODO: Test recieving.
-      it('allows recieving while values are queued');
+      it('allows recieving while values are queued', function (done) {
+        const c = new Channel()
+
+        // This will not resolve until a send happens.
+        const v = c.queue().then(function (x) {
+          expect(c.size).toEqual(0)
+          expect(x).toEqual('x')
+          done()
+        }).catch(function (err) { done(err) })
+
+        // This will trigger a receive.
+        expect(c.size).toEqual(0)
+        c.queue('x')
+      });
 
       // TODO: Test recieving where a promise was sent as a value.
       // QUESTION: Would an async lock be better?
-      it('allows receiving of promises');
+      it('allows receiving of promises, and awaits it', async function () {
+        const c = new Channel(1)
+
+        // Let's queue a promise.
+        c.queue(async function () {
+          return Promise.resolve('x')
+        }())
+
+        try {
+          const v = await c.queue()
+          expect(v).toEqual('x')
+        } catch (err) {
+          throw err
+        }
+      });
 
       it('allows closing of a channel', async function () {
         const c = new Channel();
@@ -108,15 +135,98 @@ describe('Channel', function () {
   // TODO: Pending tests...
   describe('sending, recieve and range constructor methods', function () {
     describe('Channel.send', function () {
-      it('allows sending');
+      it('allows sending', async function () {
+        const c = new Channel()
+
+        // Put a promise into the channel.
+        Channel.send(c, (async () => 'x')())
+
+        try {
+          // Receive a value from the channel.
+          const v = await Channel.receive(c)
+          expect(v).toEqual('x')
+        } catch (err) {
+          throw err
+        }
+      });
     });
 
     describe('Channel.recieve', function () {
-      it('allows reciving');
+      /**
+       * Pretty much identical to the test above... just working out some kinks.
+       */
+      it('allows receiving', async function () {
+        const c = new Channel()
+
+        // Let's send a rejecting promise.
+        Channel.send(c, (async function () {
+          throw new Error('x')
+        }()))
+
+        let m
+        try {
+          // And here we'll catch the error it throws.
+          const v = await Channel.receive(c)
+        } catch (err) {
+          m = err.message
+        }
+
+        expect(m).toEqual('x')
+      });
     });
 
     describe('Channel.range', function () {
-      it('allows ranging over a channel');
+      it('allows ranging over a channel', async function () {
+        const c = new Channel()
+
+        // Let's send some values into the channel.
+        let count = 0
+        while (count < 5) Channel.send(c, count++)
+
+        // We have to close the channel.
+        Channel.close(c)
+
+        let d = []
+
+        // Range over the channel.
+        try {
+          await Channel.range(c, function (v) {
+            return d.push(v)
+          })
+        } catch (err) {
+          throw err
+        }
+
+        expect(d).toEqual([0, 1, 2, 3, 4])
+      });
+
+      it('allows for a return value from range', async function () {
+        const c = new Channel()
+
+        /**
+         * Let's send some values into the channel;
+         * In this instance they'll be promises.
+         */
+
+        let count = 0
+        while (count < 5) Channel.send(c, new Promise(r => r(count++)))
+
+        // We have to close the channel.
+        Channel.close(c)
+
+        let d
+
+        // Range over the channel.
+        try {
+          d = await Channel.range(c, function (v) {
+            if (v !== 3) return v
+          })
+        } catch (err) {
+          throw err
+        }
+
+        expect(d).toEqual([0, 1, 2, 4])
+      })
     });
   });
 });
