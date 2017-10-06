@@ -230,3 +230,92 @@ describe('Channel', function () {
     });
   });
 });
+
+const readFile = function (path, data) {
+  return new Promise(function (resolve) {
+    setTimeout(function () {
+      return resolve(data)
+    }, Math.floor(Math.random() * 4))
+  })
+}
+
+const writeFile = function (path, data) {
+  return readFile(path, undefined)
+}
+
+describe('a basic, intended usage - takes a while', function () {
+  it('handles high concurrency and syncronization', async function () {
+    /**
+     * We reasonable need to adjust some values
+     * for this tests.
+     */
+    this.timeout(50 * 1000)
+    this.slow(40000)
+
+    const a = new Array(10000).fill(0).map(function (_, i) {
+      return i.toString()
+    })
+
+    const c = new Channel(64)
+
+    const reader = async function () {
+      try {
+        let v
+        while (v = a.shift()) {
+          await Channel.send(c, readFile(`../some/path/${v}.txt`, v))
+        }
+      } catch (err) {
+        throw err
+      }
+
+      await Channel.close(c)
+    }
+
+    reader() // Kick this puppy off.
+
+    const d = await Channel.range(c, async function (v) {
+      await writeFile(`../some/other/path/${v}.txt`)
+      return parseInt(v)
+    })
+
+    d.forEach(function (v, i) {
+      expect(v).toEqual(i)
+    })
+  })
+
+  it('can be used to block at capacity', async function () {
+    const c = new Channel(4)
+
+    const sender = async function () {
+      const a = new Array(6).fill(0)
+      try {
+        let v = a.pop()
+        while (v === 0) {
+          await Channel.send(c, v)
+        }
+      } catch (err) {
+        throw err
+      }
+    }
+
+    const size = function () {
+      return new Promise(function (resolve, reject) {
+        setTimeout(async function () {
+          try {
+            expect(c.size).toEqual(5)
+            resolve()
+          } catch (err) {
+            throw err
+          }
+        }, 32)
+      })
+    }
+
+    sender()
+
+    // Since sending is blocked... size can never change.
+    await size()
+    await size()
+  })
+})
+
