@@ -4,89 +4,89 @@
  * which still doesn't have support for the `async / await`
  * syntax.
  */
-const expect = require('expect');
+const expect = require('expect')
 
-const Channel = require('../src/index.js');
+const Channel = require('../src/index.js')
 
 describe('Channel', function () {
   describe('existence of all exported methods and properties', function () {
     it('exports a constructor as the default', function () {
-      expect(Channel).toBeA(Function);
-    });
+      expect(Channel).toBeA(Function)
+    })
 
     it('which contains all required static methods', function () {
-      expect(Channel.send).toBeA(Function);
-      expect(Channel.receive).toBeA(Function);
-      expect(Channel.range).toBeA(Function);
-    });
+      expect(Channel.send).toBeA(Function)
+      expect(Channel.receive).toBeA(Function)
+      expect(Channel.range).toBeA(Function)
+    })
 
     it('returns a Channel instance', function () {
-      const c = new Channel();
-      expect(c).toBeAn('object');
-    });
+      const c = new Channel()
+      expect(c).toBeAn('object')
+    })
 
     describe('Channel instances', function () {
       it('contains all required methods and properties', function () {
-        const c = new Channel();
+        const c = new Channel()
 
         // Methods and properties.
-        expect(c.queue).toBeA(Function);
-        expect(c.size).toBeA('number');
-        expect(c.size).toBe(0);
-        expect(c.capacity).toBeA('number');
-        expect(c.capacity).toBe(1); // NOTE: The default.
-        expect(c.open).toBeA('boolean');
-        expect(c.open).toBe(true);
-      });
+        expect(c.queue).toBeA(Function)
+        expect(c.size).toBeA('number')
+        expect(c.size).toBe(0)
+        expect(c.capacity).toBeA('number')
+        expect(c.capacity).toBe(1) // NOTE: The default.
+        expect(c.open).toBeA('boolean')
+        expect(c.open).toBe(true)
+      })
 
       it('has a specific capacity', function () {
-        const c = new Channel(16);
+        const c = new Channel(16)
 
-        expect(c.capacity).toBe(16);
-        expect(c.size).toBe(0);
-      });
+        expect(c.capacity).toBe(16)
+        expect(c.size).toBe(0)
+      })
 
       it('allows sending until that capacity is reached', async function () {
         // NOTE: This is a super contrived test... could definitely be fixed up.
-        const v = 'x';
-        const c = new Channel(2);
+        const v = 'x'
+        const c = new Channel(2)
 
-        expect(c.size).toBe(0);
+        expect(c.size).toBe(0)
 
-        await c.queue(v);
-        expect(c.size).toBe(1);
+        await c.queue(v)
+        expect(c.size).toBe(1)
 
-        await c.queue(v);
-        expect(c.size).toBe(2);
+        await c.queue(v)
+        expect(c.size).toBe(2)
 
         return new Promise(async function (resolve, reject) {
           try {
-            let tick = false;
-            c.queue(v).then(() => (tick = !tick)); // eslint-disable-line no-return-assign
+            let tick = false
+            c.queue(v).then(() => (tick = !tick)) // eslint-disable-line no-return-assign
 
             await Promise.resolve().then(function () {
-              expect(c.size).toBe(3);
+              expect(c.size).toBe(3)
 
               // Third call hasn't resolved.
-              expect(tick).toBeFalsy();
-            });
+              expect(tick).toBeFalsy()
+            })
 
             // Receivcing should resolve the send.
-            await c.queue();
-            expect(c.size).toBe(2);
+            await c.queue()
+            expect(c.size).toBe(2)
 
-            expect(tick).toBeTruthy();
-            resolve();
-          } catch (err) { reject(err); }
-        });
-      });
+            expect(tick).toBeTruthy()
+            resolve()
+          } catch (err) { reject(err) }
+        })
+      })
 
       // TODO: Test recieving.
       it('allows recieving while values are queued', function (done) {
         const c = new Channel()
 
         // This will not resolve until a send happens.
-        const v = c.queue().then(function (x) {
+        c.queue().then(function (x) {
           expect(c.size).toEqual(0)
           expect(x).toEqual('x')
           done()
@@ -95,7 +95,7 @@ describe('Channel', function () {
         // This will trigger a receive.
         expect(c.size).toEqual(0)
         c.queue('x')
-      });
+      })
 
       // TODO: Test recieving where a promise was sent as a value.
       // QUESTION: Would an async lock be better?
@@ -113,24 +113,24 @@ describe('Channel', function () {
         } catch (err) {
           throw err
         }
-      });
+      })
 
       it('allows closing of a channel', async function () {
-        const c = new Channel();
+        const c = new Channel()
 
-        expect(c.open).toBe(true);
+        expect(c.open).toBe(true)
 
-        await c.queue('x');
-        expect(c.open).toBe(true);
+        await c.queue('x')
+        expect(c.open).toBe(true)
 
-        await c.queue();
-        expect(c.open).toBe(true);
+        await c.queue()
+        expect(c.open).toBe(true)
 
-        await c.queue(null);
-        expect(c.open).toBe(false);
-      });
-    });
-  });
+        await c.queue(null)
+        expect(c.open).toBe(false)
+      })
+    })
+  })
 
   // TODO: Pending tests...
   describe('sending, recieve and range constructor methods', function () {
@@ -148,8 +148,8 @@ describe('Channel', function () {
         } catch (err) {
           throw err
         }
-      });
-    });
+      })
+    })
 
     describe('Channel.recieve', function () {
       /**
@@ -166,14 +166,14 @@ describe('Channel', function () {
         let m
         try {
           // And here we'll catch the error it throws.
-          const v = await Channel.receive(c)
+          await Channel.receive(c)
         } catch (err) {
           m = err.message
         }
 
         expect(m).toEqual('x')
-      });
-    });
+      })
+    })
 
     describe('Channel.range', function () {
       it('allows ranging over a channel', async function () {
@@ -186,7 +186,7 @@ describe('Channel', function () {
         // We have to close the channel.
         Channel.close(c)
 
-        let d = []
+        const d = []
 
         // Range over the channel.
         try {
@@ -198,13 +198,13 @@ describe('Channel', function () {
         }
 
         expect(d).toEqual([0, 1, 2, 3, 4])
-      });
+      })
 
       it('allows for a return value from range', async function () {
         const c = new Channel()
 
         /**
-         * Let's send some values into the channel;
+         * Let's send some values into the channel
          * In this instance they'll be promises.
          */
 
@@ -220,16 +220,18 @@ describe('Channel', function () {
         try {
           d = await Channel.range(c, function (v) {
             if (v !== 3) return v
+            return undefined // ESLint made me.
           })
         } catch (err) {
           throw err
         }
 
         expect(d).toEqual([0, 1, 2, 4])
+        return undefined // ESLint made me.
       })
-    });
-  });
-});
+    })
+  })
+})
 
 const readFile = function (path, data) {
   return new Promise(function (resolve) {
@@ -239,7 +241,7 @@ const readFile = function (path, data) {
   })
 }
 
-const writeFile = function (path, data) {
+const writeFile = function (path) {
   return readFile(path, undefined)
 }
 
@@ -261,7 +263,7 @@ describe('a basic, intended usage - takes a while', function () {
     const reader = async function () {
       try {
         let v
-        while (v = a.shift()) {
+        while (v = a.shift()) { // eslint-disable-line no-cond-assign
           await Channel.send(c, readFile(`../some/path/${v}.txt`, v))
         }
       } catch (err) {
@@ -275,7 +277,7 @@ describe('a basic, intended usage - takes a while', function () {
 
     const d = await Channel.range(c, async function (v) {
       await writeFile(`../some/other/path/${v}.txt`)
-      return parseInt(v)
+      return parseInt(v, 10)
     })
 
     d.forEach(function (v, i) {
@@ -292,6 +294,7 @@ describe('a basic, intended usage - takes a while', function () {
         let v = a.pop()
         while (v === 0) {
           await Channel.send(c, v)
+          v = a.pop()
         }
       } catch (err) {
         throw err
@@ -299,7 +302,7 @@ describe('a basic, intended usage - takes a while', function () {
     }
 
     const size = function () {
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         setTimeout(async function () {
           try {
             expect(c.size).toEqual(5)

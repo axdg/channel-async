@@ -1,49 +1,44 @@
-# Promise-Channel
+# Channel
 
 > JS channels implementation... for async fun.
+
+[![CircleCI](https://circleci.com/gh/axdg/channel-async.svg?style=shield)](https://circleci.com/gh/axdg/channel-async)  [![Build Status](https://semaphoreci.com/api/v1/axdg/channel-async/branches/master/shields_badge.svg)](https://semaphoreci.com/axdg/channel-async)
 
 ## About
 
 **WIP**
 
-**TODO:**
-
- - Publish to NPM
- - Complete test suite
- - Create a `promise-channel-fs` module... for reading and writing buffers in a folder.
- - Set up CI on CircleCI and Semaphore.
-
 ## Installation
 
-`npm install --save <no npm package yet>`
+`npm install --save channel-async`
 
 ## Usage
 
 ```js
-const Channel = require('promise-channel'); // eslint-disable-line import/no-unresolved
+const Channel = require('channel-async')
 
 function sender(channel, data) {
-  const values = [...data];
+  const values = [...data]
 
-  let value;
+  let value
   while (value = values.shift()) {
-    Channel.send(channel, value);
+    Channel.send(channel, value)
   }
 
-  Channel.close(channel);
+  Channel.close(channel)
 }
 
 async function receiver(channel) {
-  const values = [];
-  await Channel.range(channel, values.push);
-  return values;
+  const values = []
+  await Channel.range(channel, values.push)
+  return values
 }
 
-const channel = new Channel(1);
-const data = [1, 2, 3, 4, 5];
+const channel = new Channel(1)
+const data = [1, 2, 3, 4, 5]
 
-sender(channel, data);
-receiver(channel).then(data => console.log(data));
+sender(channel, data)
+receiver(channel).then(data => console.log(data))
 
 // => '[1, 2, 3, 4, 5]'
 

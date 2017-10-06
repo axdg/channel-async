@@ -8,15 +8,15 @@
  * @returns {Object}
  */
 const Channel = function Channel(capacity = 1) {
-  const queued = [];
-  const inbound = [];
-  const outbound = [];
+  const queued = []
+  const inbound = []
+  const outbound = []
 
-  let closed = false;
+  let closed = false
 
   // Type check the arguments.
   if (typeof capacity !== 'number' || capacity < 1) {
-    throw new Error('capacity must be a non-zero positive integer');
+    throw new Error('capacity must be a non-zero positive integer')
   }
 
   /**
@@ -33,35 +33,35 @@ const Channel = function Channel(capacity = 1) {
       return new Promise(function (resolve, reject) {
         // The channel is closed... sending is not possible.
         if (closed === true) {
-          return reject(new Error('attempt to send into a closed channel'));
+          return reject(new Error('attempt to send into a closed channel'))
         }
 
         // The channel should be closed.
         if (value === null) {
-          closed = true;
-          return resolve();
+          closed = true
+          return resolve()
         }
 
         // The internal buffer is at capacity.
         if (queued.length === capacity) {
           return inbound.push(function () {
-            queued.push(value);
+            queued.push(value)
             if (outbound.length > 0) {
-              outbound.shift()();
+              outbound.shift()()
             }
 
-            return resolve(value);
-          });
+            return resolve(value)
+          })
         }
 
         // The internal buffer is not at capacity - ready to go straight onto the queue.
-        queued.push(value);
+        queued.push(value)
         if (outbound.length > 0) {
-          outbound.shift()();
+          outbound.shift()()
         }
 
-        return resolve();
-      });
+        return resolve()
+      })
     }
 
     // Called with no value, so this is a receive action.
@@ -69,25 +69,25 @@ const Channel = function Channel(capacity = 1) {
       // There are no items in the queue.
       if (!queued.length) {
         // The channel was closed, so resolve null.
-        if (closed) return resolve(null);
+        if (closed) return resolve(null)
 
         // The channel is open, wait for a value.
         return outbound.push(() => {
           if (inbound.length > 0) {
-            inbound.shift()();
+            inbound.shift()()
           }
 
-          return resolve(queued.shift());
-        });
+          return resolve(queued.shift())
+        })
       }
 
       if (inbound.length > 0) {
-        inbound.shift()();
+        inbound.shift()()
       }
 
-      return resolve(queued.shift());
-    });
-  };
+      return resolve(queued.shift())
+    })
+  }
 
   /**
    * A proxy to `this.queue(null)`, for convinience.
@@ -95,27 +95,27 @@ const Channel = function Channel(capacity = 1) {
    * @returns {Promise}
    */
   this.close = function () {
-    return this.queue(null);
-  };
+    return this.queue(null)
+  }
 
   // Accessor for the Channel's `capacity`.
   Object.defineProperty(this, 'capacity', {
-    get() { return capacity; },
-    set() { return capacity; },
-  });
+    get() { return capacity },
+    set() { return capacity },
+  })
 
   // Accessor for the Channel's `size`.
   Object.defineProperty(this, 'size', {
-    get() { return queued.length + inbound.length; },
-    set() { return queued.length + inbound.length; },
-  });
+    get() { return queued.length + inbound.length },
+    set() { return queued.length + inbound.length },
+  })
 
   // Accesor indicating if the Channel has been closed.
   Object.defineProperty(this, 'open', {
-    get() { return !closed; },
-    set() { return !closed; },
-  });
-};
+    get() { return !closed },
+    set() { return !closed },
+  })
+}
 
 /**
  * Static send method - a property of the Channel constructor.
@@ -126,8 +126,8 @@ const Channel = function Channel(capacity = 1) {
  * @returns {Promise}
  */
 Channel.send = function (channel, value) {
-  return channel.queue(value);
-};
+  return channel.queue(value)
+}
 
 /**
  * Static close method - a property of the Channel constructor.
@@ -139,8 +139,8 @@ Channel.send = function (channel, value) {
  * @returns {Promise}
  */
 Channel.close = function (channel) {
-  return channel.queue(null);
-};
+  return channel.queue(null)
+}
 
 /**
  * Static recieve method.
@@ -150,8 +150,8 @@ Channel.close = function (channel) {
  * @returns {Promise}
  */
 Channel.receive = function (channel) {
-  return channel.queue();
-};
+  return channel.queue()
+}
 
 /**
  * Static range method - a property of the Channel constructor.
@@ -163,19 +163,19 @@ Channel.receive = function (channel) {
  */
 Channel.range = async function (channel, fn) {
   const d = []
-  let value = await channel.queue();
+  let value = await channel.queue()
   while (value !== null) {
     try {
-      const i = await fn(value); // eslint-disable-line no-await-in-loop
+      const i = await fn(value) // eslint-disable-line no-await-in-loop
       if (i !== undefined) d.push(i)
-      value = await channel.queue(); // eslint-disable-line no-await-in-loop
+      value = await channel.queue() // eslint-disable-line no-await-in-loop
     } catch (err) {
-      return Promise.reject(err);
+      return Promise.reject(err)
     }
   }
 
-  return Promise.resolve(d);
-};
+  return Promise.resolve(d)
+}
 
   /**
    * "If you were to take the entire universe and put it in
@@ -183,4 +183,4 @@ Channel.range = async function (channel, fn) {
    *
    * - Tim (paraphrase)
    */
-module.exports = Channel;
+module.exports = Channel
